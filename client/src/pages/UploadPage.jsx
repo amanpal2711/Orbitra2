@@ -5,7 +5,6 @@ import {
   AlertCircle,
   ArrowLeft,
   CheckCircle,
-  CloudUpload,
   File,
   FileText,
   Image,
@@ -195,8 +194,8 @@ function UploadPage() {
             <ArrowLeft className="h-4 w-4" />
             Back to dashboard
           </Link>
-          <div className="hidden items-center gap-2 rounded-full border border-[var(--border)] bg-white/4 px-4 py-2 font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] md:flex">
-            <CloudUpload className="h-4 w-4 text-[#d4a853]" />
+            <div className="hidden items-center gap-2 rounded-full border border-[var(--border)] bg-white/4 px-4 py-2 font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] md:flex">
+            <Upload className="h-4 w-4 text-[#d4a853]" />
             Generate wizard
           </div>
         </div>
