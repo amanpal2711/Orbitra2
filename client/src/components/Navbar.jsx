@@ -1,128 +1,174 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { Plane, LogOut, User, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { LogOut, Menu, Plane, Sparkles, X } from 'lucide-react'
 import useAuthStore from '../stores/authStore'
+
+const publicLinks = [
+  { label: 'How it works', href: '#how-it-works' },
+  { label: 'Features', href: '#features' },
+  { label: 'Testimonials', href: '#testimonials' },
+  { label: 'Pricing', href: '#pricing' },
+]
+
+const appLinks = [
+  { label: 'Dashboard', href: '/' },
+  { label: 'Generate', href: '/generate' },
+]
 
 function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, logout } = useAuthStore()
+  const [scrolled, setScrolled] = useState(false)
+  const { user, logout, isAuthenticated } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 18)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location.pathname])
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
+  const isHome = location.pathname === '/' && !isAuthenticated
+  const links = isHome ? publicLinks : appLinks
+
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-              <Plane className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Orbitra
-            </span>
-          </Link>
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+        scrolled || mobileMenuOpen ? 'bg-[rgba(13,15,14,0.82)] backdrop-blur-xl' : 'bg-transparent'
+      }`}
+    >
+      <div
+        className={`section-shell flex items-center justify-between transition-[height] duration-300 ${
+          scrolled || mobileMenuOpen ? 'h-[56px]' : 'h-[72px]'
+        }`}
+      >
+        <Link to="/" className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[rgba(255,255,255,0.04)] text-[#d4a853] shadow-lg">
+            <Sparkles className="h-5 w-5" />
+          </span>
+          <span className="font-display text-3xl text-[#f2ede4]">Orbitra</span>
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/"
-              className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/generate"
-              className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-            >
-              Generate
-            </Link>
-
-            {/* User Menu */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold text-xs">
-                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-                <span className="font-medium">{user?.name || 'User'}</span>
-              </div>
-
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="font-medium">Logout</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
+        <nav className="hidden items-center gap-7 lg:flex">
+          {links.map((link) =>
+            link.href.startsWith('#') ? (
+              <a key={link.label} href={link.href} className="nav-link nav-link-underline">
+                {link.label}
+              </a>
             ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+              <Link
+                key={link.label}
+                to={link.href}
+                className={`nav-link nav-link-underline ${location.pathname === link.href ? 'active' : ''}`}
+              >
+                {link.label}
+              </Link>
+            )
+          )}
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center gap-3 rounded-full border border-[var(--border)] bg-white/5 px-4 py-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d4a853]/15 text-sm font-semibold text-[#d4a853]">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <div className="text-left">
+                  <p className="font-ui text-xs uppercase tracking-[0.25em] text-[var(--text-muted)]">
+                    Welcome back
+                  </p>
+                  <p className="font-ui text-sm text-[#f2ede4]">{user?.name || 'Traveler'}</p>
+                </div>
+              </div>
+              <button onClick={handleLogout} className="travel-button travel-button-ghost">
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="travel-button travel-button-ghost">
+                Login
+              </Link>
+              <Link to="/register" className="travel-button travel-button-gold">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
-            <div className="flex flex-col space-y-3">
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/generate"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors"
-              >
-                Generate
-              </Link>
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen((value) => !value)}
+          className="lg:hidden flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border)] bg-white/5 text-[#f2ede4]"
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
 
-              {/* Mobile User Info */}
-              <div className="px-4 py-3 bg-gray-50 rounded-lg flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold">
-                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-800">{user?.name || 'User'}</p>
-                  <p className="text-sm text-gray-500">{user?.email || ''}</p>
-                </div>
-              </div>
+      {mobileMenuOpen && (
+        <div className="border-t border-[var(--border)] bg-[rgba(13,15,14,0.96)] backdrop-blur-xl lg:hidden">
+          <div className="section-shell py-5">
+            <div className="grid gap-3">
+              {links.map((link, index) =>
+                link.href.startsWith('#') ? (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    style={{ animationDelay: `${index * 70}ms` }}
+                    className="rounded-2xl border border-[var(--border)] bg-white/4 px-4 py-4 font-ui text-sm text-[#f2ede4] transition-all hover:border-[#d4a853]/30 hover:bg-white/6"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    style={{ animationDelay: `${index * 70}ms` }}
+                    className="rounded-2xl border border-[var(--border)] bg-white/4 px-4 py-4 font-ui text-sm text-[#f2ede4] transition-all hover:border-[#d4a853]/30 hover:bg-white/6"
+                  >
+                    {link.label}
+                  </Link>
+                )
+              )}
+            </div>
 
-              <button
-                onClick={() => {
-                  handleLogout()
-                  setMobileMenuOpen(false)
-                }}
-                className="mx-4 px-4 py-2 text-red-500 bg-red-50 rounded-lg font-medium transition-colors flex items-center space-x-2"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="travel-button travel-button-ghost w-full justify-center"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link to="/login" className="travel-button travel-button-ghost flex-1 justify-center">
+                    Login
+                  </Link>
+                  <Link to="/register" className="travel-button travel-button-gold flex-1 justify-center">
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-        )}
-      </div>
-    </nav>
+        </div>
+      )}
+    </header>
   )
 }
 

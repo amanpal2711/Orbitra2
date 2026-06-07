@@ -51,31 +51,56 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-4 relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
+    <div className="min-h-screen bg-[var(--bg-base)] px-4 py-6 text-[#f2ede4]">
+      <div className="section-shell grid min-h-[calc(100vh-3rem)] items-center gap-8 lg:grid-cols-[1fr_0.9fr]">
+        <section className="relative overflow-hidden rounded-[32px] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(22,25,21,0.94),rgba(12,14,12,0.98))] p-8 md:p-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,168,83,0.14),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(46,139,122,0.14),transparent_28%)]" />
+          <div className="relative z-10 max-w-xl">
+            <Link to="/" className="inline-flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--border)] bg-white/5 text-[#d4a853]">
+                <Plane className="h-5 w-5" />
+              </span>
+              <span className="font-display text-4xl">Orbitra</span>
+            </Link>
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4 shadow-lg">
-              <Plane className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Welcome Back
+            <h1 className="mt-10 font-display text-[clamp(3rem,6vw,5.8rem)] leading-[0.94]">
+              Return to your next trip.
             </h1>
-            <p className="text-gray-500 mt-2">Sign in to continue your journey</p>
+            <p className="mt-5 max-w-lg text-lg leading-8 text-[var(--text-muted)]">
+              Sign in to the luxury itinerary workspace, where your travels are organized with a
+              more editorial, premium feel.
+            </p>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              {[
+                ['Secure', 'JWT-backed private sessions'],
+                ['Fast', 'Instant route access and share links'],
+              ].map(([title, text]) => (
+                <div key={title} className="glass-panel rounded-[24px] p-5">
+                  <p className="font-ui text-xs uppercase tracking-[0.3em] text-[#d4a853]">{title}</p>
+                  <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="surface-card rounded-[32px] p-6 md:p-8">
+          <div className="mb-8">
+            <p className="section-kicker">Welcome back</p>
+            <h2 className="mt-3 font-display text-4xl text-[#f2ede4]">Login to Orbitra</h2>
+            <p className="mt-2 text-[var(--text-muted)]">
+              Continue into your dashboard, generate trips, or open shared itineraries.
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700 block">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="email" className="mb-2 block font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-dim)]" />
                 <input
                   id="email"
                   type="email"
@@ -85,89 +110,64 @@ function LoginPage() {
                     if (errors.email) setErrors((prev) => ({ ...prev, email: null }))
                   }}
                   placeholder="you@example.com"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                    errors.email ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`travel-input pl-11 ${errors.email ? 'border-[#e76f51]' : ''}`}
                 />
               </div>
-              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+              {errors.email && <p className="mt-2 text-sm text-[#e76f51]">{errors.email}</p>}
             </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-gray-700 block"
-              >
+            <div>
+              <label htmlFor="password" className="mb-2 block font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-dim)]" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(event) => {
                     setPassword(event.target.value)
-                    if (errors.password) {
-                      setErrors((prev) => ({ ...prev, password: null }))
-                    }
+                    if (errors.password) setErrors((prev) => ({ ...prev, password: null }))
                   }}
                   placeholder="Enter your password"
-                  className={`w-full pl-10 pr-12 py-3 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                    errors.password ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`travel-input pl-11 pr-12 ${errors.password ? 'border-[#e76f51]' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)] transition-colors hover:text-[#f2ede4]"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password}</p>
-              )}
+              {errors.password && <p className="mt-2 text-sm text-[#e76f51]">{errors.password}</p>}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2"
+              className="travel-button travel-button-gold w-full justify-center py-4 text-base"
             >
               {loading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Signing in...</span>
+                  Signing in...
                 </>
               ) : (
-                <>
-                  <Plane className="h-5 w-5" />
-                  <span>Sign In</span>
-                </>
+                'Sign In'
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link
-              to="/register"
-              className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-            >
-              Sign up for free
+          <p className="mt-6 text-center font-ui text-sm text-[var(--text-muted)]">
+            Don&apos;t have an account?{' '}
+            <Link to="/register" className="text-[#d4a853] transition-colors hover:text-[#f2ede4]">
+              Create one
             </Link>
           </p>
-        </div>
-
-        <p className="text-center text-white/60 text-sm mt-6">
-          (c) 2024 Orbitra Itinerary. All rights reserved.
-        </p>
+        </section>
       </div>
     </div>
   )

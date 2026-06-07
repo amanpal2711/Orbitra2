@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Check, Eye, EyeOff, Lock, Mail, Plane, User, X, Loader2 } from 'lucide-react'
+import { Check, Eye, EyeOff, Lock, Mail, Loader2, Plane, User, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import useAuthStore from '../stores/authStore'
 import api from '../utils/api'
@@ -10,11 +10,7 @@ const passwordRequirements = [
   { key: 'upper', label: 'Uppercase letter', test: (value) => /[A-Z]/.test(value) },
   { key: 'lower', label: 'Lowercase letter', test: (value) => /[a-z]/.test(value) },
   { key: 'number', label: 'Number', test: (value) => /[0-9]/.test(value) },
-  {
-    key: 'special',
-    label: 'Special character',
-    test: (value) => /[^a-zA-Z0-9]/.test(value),
-  },
+  { key: 'special', label: 'Special character', test: (value) => /[^a-zA-Z0-9]/.test(value) },
 ]
 
 function RegisterPage() {
@@ -35,14 +31,6 @@ function RegisterPage() {
   const passwordStrength = passwordRequirements.filter((requirement) =>
     requirement.test(formData.password)
   ).length
-  const strengthLabels = ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong']
-  const strengthColors = [
-    'bg-red-500',
-    'bg-orange-500',
-    'bg-yellow-500',
-    'bg-blue-500',
-    'bg-green-500',
-  ]
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -104,132 +92,138 @@ function RegisterPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-4 relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
+  const strengthLabel =
+    ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'][passwordStrength - 1] || 'Weak'
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4 shadow-lg">
-              <Plane className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Create Account
+  return (
+    <div className="min-h-screen bg-[var(--bg-base)] px-4 py-6 text-[#f2ede4]">
+      <div className="section-shell grid min-h-[calc(100vh-3rem)] items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <section className="surface-card relative overflow-hidden rounded-[32px] p-8 md:p-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,168,83,0.16),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(46,139,122,0.14),transparent_25%)]" />
+          <div className="relative z-10">
+            <Link to="/" className="inline-flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--border)] bg-white/5 text-[#d4a853]">
+                <Plane className="h-5 w-5" />
+              </span>
+              <span className="font-display text-4xl">Orbitra</span>
+            </Link>
+
+            <h1 className="mt-10 font-display text-[clamp(3rem,6vw,5.8rem)] leading-[0.94]">
+              Create a travel workspace that feels premium.
             </h1>
-            <p className="text-gray-500 mt-2">Start planning your adventures today</p>
+            <p className="mt-5 max-w-xl text-lg leading-8 text-[var(--text-muted)]">
+              Build an account to generate itineraries, manage saved trips, and share elegant
+              travel plans with the rest of your group.
+            </p>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              {[
+                ['Private', 'Secure auth and protected routes'],
+                ['Polished', 'Dark editorial interface by design'],
+              ].map(([title, text]) => (
+                <div key={title} className="glass-panel rounded-[24px] p-5">
+                  <p className="font-ui text-xs uppercase tracking-[0.3em] text-[#d4a853]">{title}</p>
+                  <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="surface-card rounded-[32px] p-6 md:p-8">
+          <div className="mb-8">
+            <p className="section-kicker">Get started</p>
+            <h2 className="mt-3 font-display text-4xl text-[#f2ede4]">Create your account</h2>
+            <p className="mt-2 text-[var(--text-muted)]">
+              Join Orbitra and begin generating trips in a more refined interface.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium text-gray-700 block">
+            <div>
+              <label className="mb-2 block font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <User className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-dim)]" />
                 <input
-                  id="name"
                   name="name"
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Jane Doe"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                    errors.name ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`travel-input pl-11 ${errors.name ? 'border-[#e76f51]' : ''}`}
                 />
               </div>
-              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+              {errors.name && <p className="mt-2 text-sm text-[#e76f51]">{errors.name}</p>}
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700 block">
+            <div>
+              <label className="mb-2 block font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-dim)]" />
                 <input
-                  id="email"
                   name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                    errors.email ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`travel-input pl-11 ${errors.email ? 'border-[#e76f51]' : ''}`}
                 />
               </div>
-              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+              {errors.email && <p className="mt-2 text-sm text-[#e76f51]">{errors.email}</p>}
             </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-gray-700 block"
-              >
+            <div>
+              <label className="mb-2 block font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-dim)]" />
                 <input
-                  id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a strong password"
-                  className={`w-full pl-10 pr-12 py-3 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                    errors.password ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`travel-input pl-11 pr-12 ${errors.password ? 'border-[#e76f51]' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)] transition-colors hover:text-[#f2ede4]"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password}</p>
-              )}
+              {errors.password && <p className="mt-2 text-sm text-[#e76f51]">{errors.password}</p>}
 
               {formData.password && (
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="mt-4 space-y-3 rounded-[24px] border border-[var(--border)] bg-white/4 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/8">
                       <div
-                        className={`h-full ${
-                          strengthColors[passwordStrength - 1] || 'bg-gray-300'
-                        } transition-all duration-300`}
-                        style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                        className="h-full rounded-full bg-gradient-to-r from-[#2e8b7a] via-[#d4a853] to-[#f2ede4] transition-all duration-300"
+                        style={{ width: `${(passwordStrength / passwordRequirements.length) * 100}%` }}
                       />
                     </div>
-                    <span className="text-xs font-medium text-gray-600 whitespace-nowrap">
-                      {strengthLabels[passwordStrength - 1] || 'Weak'}
+                    <span className="font-ui text-xs uppercase tracking-[0.25em] text-[var(--text-muted)]">
+                      {strengthLabel}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-1">
+                  <div className="grid gap-2 sm:grid-cols-2">
                     {passwordRequirements.map((requirement) => {
                       const met = requirement.test(formData.password)
                       return (
                         <div
                           key={requirement.key}
-                          className={`flex items-center gap-1.5 text-xs ${
-                            met ? 'text-green-600' : 'text-gray-400'
-                          }`}
+                          className={`flex items-center gap-2 text-xs ${met ? 'text-[#f2ede4]' : 'text-[var(--text-muted)]'}`}
                         >
-                          {met ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          {met ? <Check className="h-3.5 w-3.5 text-[#2e8b7a]" /> : <X className="h-3.5 w-3.5" />}
                           <span>{requirement.label}</span>
                         </div>
                       )
@@ -239,79 +233,57 @@ function RegisterPage() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium text-gray-700 block"
-              >
+            <div>
+              <label className="mb-2 block font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-dim)]" />
                 <input
-                  id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm your password"
-                  className={`w-full pl-10 pr-12 py-3 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                    errors.confirmPassword ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`travel-input pl-11 pr-12 ${errors.confirmPassword ? 'border-[#e76f51]' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={
-                    showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'
-                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)] transition-colors hover:text-[#f2ede4]"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-sm text-red-500">{errors.confirmPassword}</p>
+                <p className="mt-2 text-sm text-[#e76f51]">{errors.confirmPassword}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2"
+              className="travel-button travel-button-gold w-full justify-center py-4 text-base"
             >
               {loading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Creating account...</span>
+                  Creating account...
                 </>
               ) : (
-                <>
-                  <Plane className="h-5 w-5" />
-                  <span>Create Account</span>
-                </>
+                'Create Account'
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center font-ui text-sm text-[var(--text-muted)]">
             Already have an account?{' '}
-            <Link
-              to="/login"
-              className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-            >
+            <Link to="/login" className="text-[#d4a853] transition-colors hover:text-[#f2ede4]">
               Sign in
             </Link>
           </p>
-        </div>
-
-        <p className="text-center text-white/60 text-sm mt-6">
-          (c) 2024 Orbitra Itinerary. All rights reserved.
-        </p>
+        </section>
       </div>
     </div>
   )

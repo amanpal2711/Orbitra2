@@ -1,59 +1,41 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import {
-  MapPin,
+  ArrowLeft,
   Calendar,
-  Clock,
-  DollarSign,
-  Share2,
-  Download,
-  Plane,
-  Hotel,
-  User,
-  Hash,
-  Loader2,
+  CheckCircle,
   ChevronDown,
   ChevronUp,
-  Sun,
-  Moon,
-  FileText,
+  Clock,
+  DollarSign,
+  Download,
   ExternalLink,
-  CheckCircle,
+  FileText,
+  Globe2,
+  Heart,
+  Hash,
+  Hotel,
+  Loader2,
+  MapPin,
+  Moon,
+  Plane,
+  Share2,
+  Sparkles,
+  Sun,
+  User,
   AlertTriangle,
   Info,
-  Sparkles,
-  Globe,
-  Heart,
 } from 'lucide-react'
 import api from '../utils/api'
 import { normalizeItinerary, unwrapApiData } from '../utils/normalizeItinerary'
 import toast from 'react-hot-toast'
 import useAuthStore from '../stores/authStore'
 
-// Time of day color coding
 const timeOfDayStyles = {
-  morning: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    badge: 'bg-amber-100 text-amber-700',
-    icon: Sun,
-    iconColor: 'text-amber-500',
-  },
-  afternoon: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    badge: 'bg-blue-100 text-blue-700',
-    icon: Sun,
-    iconColor: 'text-blue-500',
-  },
-  evening: {
-    bg: 'bg-purple-50',
-    border: 'border-purple-200',
-    badge: 'bg-purple-100 text-purple-700',
-    icon: Moon,
-    iconColor: 'text-purple-500',
-  },
+  morning: { badge: 'bg-[#d4a853]/12 text-[#d4a853]', icon: Sun, iconColor: 'text-[#d4a853]' },
+  afternoon: { badge: 'bg-[#2e8b7a]/12 text-[#2e8b7a]', icon: Sun, iconColor: 'text-[#2e8b7a]' },
+  evening: { badge: 'bg-[#7c6cff]/12 text-[#c9c2ff]', icon: Moon, iconColor: 'text-[#c9c2ff]' },
 }
 
 function SharedItineraryPage() {
@@ -80,7 +62,7 @@ function SharedItineraryPage() {
       const normalized = normalizeItinerary(raw)
       setItinerary(normalized)
       setOwner(response.data.owner ?? null)
-      if (normalized?.days && normalized.days.length > 0) {
+      if (normalized?.days?.length > 0) {
         setActiveDay(0)
       }
     } catch {
@@ -96,10 +78,8 @@ function SharedItineraryPage() {
       const shareUrl = window.location.href
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl)
-        toast.success('Link copied to clipboard')
-      } else {
-        toast.success('Share this page URL!')
       }
+      toast.success('Link copied to clipboard')
     } catch {
       toast.error('Failed to copy link')
     } finally {
@@ -116,14 +96,12 @@ function SharedItineraryPage() {
 
     setClaiming(true)
     try {
-      const response = await api.post(`/itineraries/${itinerary._id}/claim`, {
-        shareToken,
-      })
+      const response = await api.post(`/itineraries/${itinerary._id}/claim`, { shareToken })
       const { itineraryId } = unwrapApiData(response)
       toast.success('Itinerary claimed')
       setTimeout(() => {
         navigate(`/itinerary/${itineraryId}`)
-      }, 1500)
+      }, 1200)
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to claim itinerary')
     } finally {
@@ -132,7 +110,7 @@ function SharedItineraryPage() {
   }
 
   const getTimeOfDay = (time) => {
-    const hour = parseInt(time.split(':')[0])
+    const hour = parseInt(time.split(':')[0], 10)
     if (hour < 12) return 'morning'
     if (hour < 17) return 'afternoon'
     return 'evening'
@@ -140,10 +118,9 @@ function SharedItineraryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Loading shared itinerary...</p>
+      <div className="min-h-screen bg-[var(--bg-base)] px-4 py-8 text-[#f2ede4]">
+        <div className="section-shell pt-8">
+          <div className="h-72 shimmer rounded-[32px]" />
         </div>
       </div>
     )
@@ -151,21 +128,18 @@ function SharedItineraryPage() {
 
   if (!itinerary) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Globe className="h-12 w-12 text-blue-600" />
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)] px-4 text-[#f2ede4]">
+        <div className="surface-card max-w-md rounded-[32px] p-8 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#d4a853]/10 text-[#d4a853]">
+            <Globe2 className="h-10 w-10" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-3">Itinerary Not Found</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="mt-6 font-display text-4xl">Itinerary not found</h1>
+          <p className="mt-3 text-[var(--text-muted)]">
             This shared itinerary may have expired or been removed by the owner.
           </p>
-          <Link
-            to="/register"
-            className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
-          >
-            <Sparkles className="h-5 w-5" />
-            <span>Create Your Own</span>
+          <Link to="/register" className="travel-button travel-button-gold mt-8">
+            <Sparkles className="h-4 w-4" />
+            Create your own
           </Link>
         </div>
       </div>
@@ -177,244 +151,190 @@ function SharedItineraryPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* Simple Public Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-                <Plane className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Orbitra
-              </span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full flex items-center">
-                <Heart className="h-3 w-3 mr-1" />
-                Shared Itinerary
-              </span>
-              {!isAuthenticated && (
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-gray-600 hover:text-blue-600 font-medium transition-colors"
-                >
-                  Sign In
-                </Link>
-              )}
-            </div>
+    <div className="min-h-screen bg-[var(--bg-base)] text-[#f2ede4]">
+      <header className="border-b border-[var(--border)] bg-[rgba(13,15,14,0.88)] backdrop-blur-xl">
+        <div className="section-shell flex items-center justify-between py-4">
+          <Link to="/" className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--border)] bg-white/5 text-[#d4a853]">
+              <Plane className="h-5 w-5" />
+            </span>
+            <span className="font-display text-3xl">Orbitra</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="hidden rounded-full border border-[var(--border)] bg-white/4 px-3 py-1 font-ui text-[11px] uppercase tracking-[0.3em] text-[var(--text-muted)] md:inline-flex">
+              Shared itinerary
+            </span>
+            {!isAuthenticated && (
+              <Link to="/login" className="travel-button travel-button-ghost">
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Shared By Banner */}
+      <div className="section-shell py-8">
         {owner && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-4 mb-6 flex items-center justify-between border border-gray-100">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold">
-                  {owner.name?.charAt(0).toUpperCase() || 'U'}
-                </span>
+          <div className="surface-card mb-6 flex flex-col gap-4 rounded-[28px] p-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#d4a853]/15 text-[#d4a853]">
+                {owner.name?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div>
-                <p className="text-sm text-gray-500">Shared by</p>
-                <p className="font-semibold text-gray-800">{owner.name}</p>
+                <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Shared by</p>
+                <p className="mt-1 text-[#f2ede4]">{owner.name}</p>
               </div>
             </div>
+
             <button
               onClick={handleClaimItinerary}
               disabled={claiming}
-              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+              className="travel-button travel-button-gold"
             >
-              {claiming ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4" />
-              )}
-              <span>{isAuthenticated ? 'Claim Itinerary' : 'Sign In to Claim'}</span>
+              {claiming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {isAuthenticated ? 'Claim itinerary' : 'Sign in to claim'}
             </button>
           </div>
         )}
 
-        {/* Hero Section */}
-        <div className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 rounded-3xl shadow-2xl p-8 md:p-12 mb-8 overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-
-          <div className="relative z-10">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-4">
-                  <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-sm font-medium rounded-full">
-                    {duration} Day{duration > 1 ? 's' : ''} Trip
+        <section className="surface-card relative overflow-hidden rounded-[32px] p-6 md:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,168,83,0.14),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(46,139,122,0.12),transparent_22%)]" />
+          <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="rounded-full border border-[var(--border)] bg-white/4 px-3 py-1 font-ui text-[11px] uppercase tracking-[0.28em] text-[var(--text-muted)]">
+                  {duration} Day{duration > 1 ? 's' : ''} Trip
+                </span>
+                {itinerary.preferences && (
+                  <span className="rounded-full border border-[var(--border)] bg-white/4 px-3 py-1 font-ui text-[11px] uppercase tracking-[0.28em] text-[var(--text-muted)]">
+                    {itinerary.preferences}
                   </span>
-                  {itinerary.preferences && (
-                    <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-sm font-medium rounded-full">
-                      {itinerary.preferences}
-                    </span>
-                  )}
-                </div>
-
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                  {itinerary.destination}
-                </h1>
-
-                <div className="flex flex-wrap items-center gap-6 text-white/90">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-5 w-5" />
-                    <span className="font-medium">
-                      {format(new Date(itinerary.startDate), 'MMM d, yyyy')} -{' '}
-                      {format(new Date(itinerary.endDate), 'MMM d, yyyy')}
-                    </span>
-                  </div>
-
-                  {itinerary.budget && (
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="h-5 w-5" />
-                      <span className="font-medium">
-                        ${itinerary.budget.toLocaleString()} estimated
-                      </span>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={handleShare}
-                  disabled={sharing}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors disabled:opacity-50"
-                >
-                  {sharing ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Share2 className="h-5 w-5" />
-                  )}
-                  <span className="font-medium">Share</span>
-                </button>
+              <h1 className="mt-5 font-display text-[clamp(3rem,6vw,5.8rem)] leading-[0.94]">
+                {itinerary.destination}
+              </h1>
 
-                <button className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors">
-                  <Download className="h-5 w-5" />
-                  <span className="font-medium">PDF</span>
-                </button>
+              <div className="mt-4 flex flex-wrap gap-5 text-sm text-[var(--text-muted)]">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-[#d4a853]" />
+                  {format(new Date(itinerary.startDate), 'MMM d, yyyy')} -{' '}
+                  {format(new Date(itinerary.endDate), 'MMM d, yyyy')}
+                </div>
+                {itinerary.budget && (
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-[#2e8b7a]" />
+                    ${itinerary.budget.toLocaleString()} estimated
+                  </div>
+                )}
               </div>
             </div>
 
-            {itinerary.bookingReference && (
-              <div className="mt-6 pt-6 border-t border-white/20">
-                <div className="flex items-center space-x-2 text-white/80">
-                  <Hash className="h-4 w-4" />
-                  <span className="text-sm font-medium">
-                    Booking Reference: {itinerary.bookingReference}
-                  </span>
-                </div>
-              </div>
-            )}
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={handleShare}
+                disabled={sharing}
+                className="travel-button travel-button-ghost"
+              >
+                {sharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+                Share
+              </button>
+              <button className="travel-button travel-button-gold">
+                <Download className="h-4 w-4" />
+                PDF
+              </button>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Trip Overview Card */}
-            {(itinerary.airline || itinerary.hotel || itinerary.travelerName) && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
-                    <Info className="h-5 w-5 text-blue-600" />
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-6">
+            {(itinerary.airline || itinerary.hotel || itinerary.travelerName || itinerary.bookingReference) && (
+              <section className="surface-card rounded-[28px] p-6">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#d4a853]/12 text-[#d4a853]">
+                    <Info className="h-5 w-5" />
                   </div>
-                  Trip Overview
-                </h2>
+                  <h2 className="font-display text-4xl text-[#f2ede4]">Trip overview</h2>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid gap-4 md:grid-cols-2">
                   {itinerary.airline && (
-                    <div className="flex items-start space-x-3">
-                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Plane className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Airline</p>
-                        <p className="font-semibold text-gray-800">{itinerary.airline}</p>
-                        {itinerary.flightNumber && (
-                          <p className="text-sm text-gray-500">
-                            Flight: {itinerary.flightNumber}
-                          </p>
-                        )}
+                    <div className="rounded-[22px] border border-[var(--border)] bg-white/4 p-4">
+                      <div className="flex items-start gap-3">
+                        <Plane className="mt-1 h-5 w-5 text-[#d4a853]" />
+                        <div>
+                          <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Airline</p>
+                          <p className="mt-2 text-[#f2ede4]">{itinerary.airline}</p>
+                          {itinerary.flightNumber && <p className="mt-1 text-sm text-[var(--text-muted)]">Flight: {itinerary.flightNumber}</p>}
+                        </div>
                       </div>
                     </div>
                   )}
 
                   {itinerary.hotel && (
-                    <div className="flex items-start space-x-3">
-                      <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Hotel className="h-5 w-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Hotel</p>
-                        <p className="font-semibold text-gray-800">{itinerary.hotel}</p>
-                        {itinerary.checkIn && itinerary.checkOut && (
-                          <p className="text-sm text-gray-500">
-                            {format(new Date(itinerary.checkIn), 'MMM d')} -{' '}
-                            {format(new Date(itinerary.checkOut), 'MMM d, yyyy')}
-                          </p>
-                        )}
+                    <div className="rounded-[22px] border border-[var(--border)] bg-white/4 p-4">
+                      <div className="flex items-start gap-3">
+                        <Hotel className="mt-1 h-5 w-5 text-[#2e8b7a]" />
+                        <div>
+                          <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Hotel</p>
+                          <p className="mt-2 text-[#f2ede4]">{itinerary.hotel}</p>
+                          {itinerary.checkIn && itinerary.checkOut && (
+                            <p className="mt-1 text-sm text-[var(--text-muted)]">
+                              {format(new Date(itinerary.checkIn), 'MMM d')} - {format(new Date(itinerary.checkOut), 'MMM d, yyyy')}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
 
                   {itinerary.travelerName && (
-                    <div className="flex items-start space-x-3">
-                      <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <User className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Traveler</p>
-                        <p className="font-semibold text-gray-800">{itinerary.travelerName}</p>
+                    <div className="rounded-[22px] border border-[var(--border)] bg-white/4 p-4">
+                      <div className="flex items-start gap-3">
+                        <User className="mt-1 h-5 w-5 text-[#d4a853]" />
+                        <div>
+                          <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Traveler</p>
+                          <p className="mt-2 text-[#f2ede4]">{itinerary.travelerName}</p>
+                        </div>
                       </div>
                     </div>
                   )}
 
                   {itinerary.bookingReference && (
-                    <div className="flex items-start space-x-3">
-                      <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Hash className="h-5 w-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Booking Reference</p>
-                        <p className="font-semibold text-gray-800 font-mono">
-                          {itinerary.bookingReference}
-                        </p>
+                    <div className="rounded-[22px] border border-[var(--border)] bg-white/4 p-4">
+                      <div className="flex items-start gap-3">
+                        <Hash className="mt-1 h-5 w-5 text-[#f2ede4]" />
+                        <div>
+                          <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Booking reference</p>
+                          <p className="mt-2 font-mono text-sm text-[#f2ede4]">{itinerary.bookingReference}</p>
+                        </div>
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
+              </section>
             )}
 
-            {/* Day-by-Day Itinerary Timeline */}
-            {itinerary.days && itinerary.days.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                  <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
-                    <Calendar className="h-5 w-5 text-purple-600" />
+            {itinerary.days?.length > 0 && (
+              <section className="surface-card rounded-[28px] p-6">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2e8b7a]/12 text-[#2e8b7a]">
+                    <Calendar className="h-5 w-5" />
                   </div>
-                  Day-by-Day Itinerary
-                </h2>
+                  <h2 className="font-display text-4xl text-[#f2ede4]">Day-by-day itinerary</h2>
+                </div>
 
-                {/* Day Tabs */}
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className="mb-6 flex flex-wrap gap-2">
                   {itinerary.days.map((day, index) => (
                     <button
                       key={index}
                       onClick={() => setActiveDay(index)}
-                      className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                      className={`rounded-full px-4 py-2 font-ui text-sm transition-all ${
                         activeDay === index
-                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          ? 'bg-[#d4a853] text-[#10110f]'
+                          : 'border border-[var(--border)] bg-white/4 text-[var(--text-muted)] hover:text-[#f2ede4]'
                       }`}
                     >
                       Day {index + 1}
@@ -422,283 +342,203 @@ function SharedItineraryPage() {
                   ))}
                 </div>
 
-                {/* Active Day Content */}
                 {itinerary.days[activeDay] && (
                   <div className="space-y-4">
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-gray-800">
+                    <div>
+                      <h3 className="font-display text-3xl text-[#f2ede4]">
                         {itinerary.days[activeDay].title || `Day ${activeDay + 1}`}
                       </h3>
                       {itinerary.days[activeDay].description && (
-                        <p className="text-gray-600 mt-1">
+                        <p className="mt-2 text-[var(--text-muted)]">
                           {itinerary.days[activeDay].description}
                         </p>
                       )}
                     </div>
 
-                    {itinerary.days[activeDay].activities &&
-                      itinerary.days[activeDay].activities.map((activity, actIndex) => {
+                    <div className="space-y-3">
+                      {itinerary.days[activeDay].activities?.map((activity, index) => {
                         const timeOfDay = getTimeOfDay(activity.time || '12:00')
                         const style = timeOfDayStyles[timeOfDay]
                         const TimeIcon = style.icon
 
                         return (
-                          <div
-                            key={actIndex}
-                            className={`p-4 rounded-xl border-l-4 ${style.bg} ${style.border} transition-all hover:shadow-md`}
-                          >
+                          <div key={index} className="rounded-[24px] border border-[var(--border)] bg-white/4 p-4">
                             <div className="flex items-start gap-4">
-                              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${style.badge}`}>
-                                <TimeIcon className={`h-6 w-6 ${style.iconColor}`} />
+                              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${style.badge}`}>
+                                <TimeIcon className={`h-5 w-5 ${style.iconColor}`} />
                               </div>
-
-                              <div className="flex-1">
-                                <div className="flex items-start justify-between">
-                                  <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${style.badge}`}>
-                                        {activity.time || 'All Day'}
-                                      </span>
-                                      {activity.duration && (
-                                        <span className="flex items-center text-xs text-gray-500">
-                                          <Clock className="h-3 w-3 mr-1" />
-                                          {activity.duration}
-                                        </span>
-                                      )}
-                                    </div>
-
-                                    <h4 className="text-lg font-bold text-gray-800">
-                                      {activity.name}
-                                    </h4>
-
-                                    {activity.location && (
-                                      <p className="flex items-center text-sm text-gray-500 mt-1">
-                                        <MapPin className="h-4 w-4 mr-1" />
-                                        {activity.location}
-                                      </p>
-                                    )}
-
-                                    {activity.description && (
-                                      <p className="text-gray-600 text-sm mt-2">
-                                        {activity.description}
-                                      </p>
-                                    )}
-
-                                    {activity.tips && (
-                                      <p className="text-gray-500 text-sm italic mt-2 flex items-center">
-                                        <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" />
-                                        {activity.tips}
-                                      </p>
-                                    )}
-                                  </div>
-
-                                  {activity.cost && (
-                                    <div className="text-right flex-shrink-0">
-                                      <p className="text-sm text-gray-500">Est. Cost</p>
-                                      <p className="text-lg font-bold text-gray-800">
-                                        ${activity.cost}
-                                      </p>
-                                    </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className={`rounded-full px-3 py-1 font-ui text-[11px] uppercase tracking-[0.28em] ${style.badge}`}>
+                                    {activity.time || 'All day'}
+                                  </span>
+                                  {activity.duration && (
+                                    <span className="flex items-center gap-1 font-ui text-xs text-[var(--text-muted)]">
+                                      <Clock className="h-3.5 w-3.5" />
+                                      {activity.duration}
+                                    </span>
                                   )}
                                 </div>
+                                <h4 className="mt-3 text-2xl text-[#f2ede4]">{activity.name}</h4>
+                                {activity.location && (
+                                  <p className="mt-2 flex items-center gap-2 text-sm text-[var(--text-muted)]">
+                                    <MapPin className="h-4 w-4" />
+                                    {activity.location}
+                                  </p>
+                                )}
+                                {activity.description && (
+                                  <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">
+                                    {activity.description}
+                                  </p>
+                                )}
+                                {activity.tips && (
+                                  <p className="mt-3 flex items-start gap-2 text-sm text-[#d4a853]">
+                                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                                    <span>{activity.tips}</span>
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </div>
                         )
                       })}
+                    </div>
                   </div>
                 )}
-              </div>
+              </section>
             )}
 
-            {/* Travel Tips Section (Expandable) */}
-            {itinerary.travelTips && itinerary.travelTips.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <button
-                  onClick={() => setExpandedTips(!expandedTips)}
-                  className="w-full flex items-center justify-between"
-                >
-                  <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-3">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+            {itinerary.travelTips?.length > 0 && (
+              <section className="surface-card rounded-[28px] p-6">
+                <button onClick={() => setExpandedTips(!expandedTips)} className="flex w-full items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2e8b7a]/12 text-[#2e8b7a]">
+                      <CheckCircle className="h-5 w-5" />
                     </div>
-                    Travel Tips
-                  </h2>
-                  {expandedTips ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
-                  )}
+                    <h2 className="font-display text-4xl text-[#f2ede4]">Travel tips</h2>
+                  </div>
+                  {expandedTips ? <ChevronUp className="h-5 w-5 text-[var(--text-muted)]" /> : <ChevronDown className="h-5 w-5 text-[var(--text-muted)]" />}
                 </button>
 
                 {expandedTips && (
                   <div className="mt-6 space-y-3">
                     {itinerary.travelTips.map((tip, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start space-x-3 p-3 bg-green-50 rounded-xl"
-                      >
-                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <p className="text-gray-700">{tip}</p>
+                      <div key={index} className="rounded-[20px] border border-[var(--border)] bg-white/4 p-4 text-[var(--text-muted)]">
+                        {tip}
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
+              </section>
             )}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-8">
-            {/* Recommendations */}
+          <aside className="space-y-6">
             {itinerary.recommendations && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <h2 className="text-xl font-bold text-gray-800 mb-6">Recommendations</h2>
+              <section className="surface-card rounded-[28px] p-6">
+                <h2 className="font-display text-4xl text-[#f2ede4]">Recommendations</h2>
+                <div className="mt-5 space-y-5">
+                  {itinerary.recommendations.restaurants?.length > 0 && (
+                    <div>
+                      <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Restaurants</p>
+                      <div className="mt-3 space-y-2">
+                        {itinerary.recommendations.restaurants.map((item, index) => (
+                          <div key={index} className="rounded-[18px] border border-[var(--border)] bg-white/4 p-3 text-sm text-[#f2ede4]">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-                {itinerary.recommendations.restaurants && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                      Restaurants
-                    </h3>
-                    <ul className="space-y-2">
-                      {itinerary.recommendations.restaurants.map((restaurant, index) => (
-                        <li
-                          key={index}
-                          className="flex items-center space-x-2 text-gray-700"
-                        >
-                          <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
-                          <span>{restaurant}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                  {itinerary.recommendations.hotels?.length > 0 && (
+                    <div>
+                      <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Hotels</p>
+                      <div className="mt-3 space-y-2">
+                        {itinerary.recommendations.hotels.map((item, index) => (
+                          <div key={index} className="rounded-[18px] border border-[var(--border)] bg-white/4 p-3 text-sm text-[#f2ede4]">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-                {itinerary.recommendations.hotels && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                      Hotels
-                    </h3>
-                    <ul className="space-y-2">
-                      {itinerary.recommendations.hotels.map((hotel, index) => (
-                        <li
-                          key={index}
-                          className="flex items-center space-x-2 text-gray-700"
-                        >
-                          <span className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
-                          <span>{hotel}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {itinerary.recommendations.attractions && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                      Must-See Attractions
-                    </h3>
-                    <ul className="space-y-2">
-                      {itinerary.recommendations.attractions.map((attraction, index) => (
-                        <li
-                          key={index}
-                          className="flex items-center space-x-2 text-gray-700"
-                        >
-                          <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                          <span>{attraction}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+                  {itinerary.recommendations.attractions?.length > 0 && (
+                    <div>
+                      <p className="font-ui text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Attractions</p>
+                      <div className="mt-3 space-y-2">
+                        {itinerary.recommendations.attractions.map((item, index) => (
+                          <div key={index} className="rounded-[18px] border border-[var(--border)] bg-white/4 p-3 text-sm text-[#f2ede4]">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
             )}
 
-            {/* Uploaded Documents (Expandable) */}
-            {itinerary.documents && itinerary.documents.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <button
-                  onClick={() => setExpandedDocs(!expandedDocs)}
-                  className="w-full flex items-center justify-between"
-                >
-                  <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mr-3">
-                      <FileText className="h-5 w-5 text-gray-600" />
-                    </div>
+            {itinerary.documents?.length > 0 && (
+              <section className="surface-card rounded-[28px] p-6">
+                <button onClick={() => setExpandedDocs(!expandedDocs)} className="flex w-full items-center justify-between">
+                  <h2 className="font-display text-3xl text-[#f2ede4]">
                     Documents ({itinerary.documents.length})
                   </h2>
-                  {expandedDocs ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
-                  )}
+                  {expandedDocs ? <ChevronUp className="h-5 w-5 text-[var(--text-muted)]" /> : <ChevronDown className="h-5 w-5 text-[var(--text-muted)]" />}
                 </button>
 
                 {expandedDocs && (
-                  <div className="mt-6 space-y-3">
+                  <div className="mt-5 space-y-3">
                     {itinerary.documents.map((doc, index) => (
                       <a
                         key={index}
                         href={doc.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between rounded-[20px] border border-[var(--border)] bg-white/4 p-3 transition-all hover:border-[#d4a853]/25"
                       >
-                        <div className="flex items-center space-x-3">
-                          <FileText className="h-5 w-5 text-gray-500" />
-                          <span className="text-sm font-medium text-gray-700 truncate max-w-xs">
-                            {doc.name}
-                          </span>
+                        <div className="flex items-center gap-3">
+                          <FileText className="h-5 w-5 text-[#d4a853]" />
+                          <span className="truncate text-sm text-[#f2ede4]">{doc.name}</span>
                         </div>
-                        <ExternalLink className="h-4 w-4 text-gray-400" />
+                        <ExternalLink className="h-4 w-4 text-[var(--text-muted)]" />
                       </a>
                     ))}
                   </div>
                 )}
-              </div>
+              </section>
             )}
 
-            {/* CTA Card */}
-            <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
-              <div className="flex items-center space-x-2 mb-4">
-                <Plane className="h-6 w-6" />
-                <span className="font-bold text-lg">Orbitra</span>
-              </div>
-              <h2 className="text-xl font-bold mb-3">Love this itinerary?</h2>
-              <p className="text-white/80 mb-4">
-                Create your own personalized AI-powered itinerary in minutes!
+            <section className="surface-card rounded-[28px] p-6">
+              <h2 className="font-display text-4xl text-[#f2ede4]">Create your own</h2>
+              <p className="mt-3 text-[var(--text-muted)]">
+                Build a trip of your own with the same premium itinerary flow.
               </p>
-              <Link
-                to="/register"
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white text-blue-600 font-semibold rounded-xl hover:bg-white/90 transition-colors"
-              >
-                <Sparkles className="h-5 w-5" />
-                <span>Create Your Own Itinerary</span>
+              <Link to="/register" className="travel-button travel-button-gold mt-6 w-full justify-center">
+                <Sparkles className="h-4 w-4" />
+                Start now
               </Link>
-            </div>
-          </div>
+            </section>
+          </aside>
         </div>
 
-        {/* Powered by Footer */}
-        <footer className="mt-12 py-6 border-t border-gray-200">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center space-x-2 text-gray-500">
-              <span className="text-sm">Powered by</span>
-              <div className="flex items-center space-x-1">
-                <Plane className="h-4 w-4 text-blue-600" />
-                <span className="font-semibold text-gray-700">Orbitra</span>
-              </div>
-              <span className="text-sm">Itinerary Builder</span>
+        <footer className="mt-8 border-t border-[var(--border)] py-6 text-sm text-[var(--text-muted)]">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Heart className="h-4 w-4 text-[#d4a853]" />
+              Shared with Orbitra
             </div>
-            <div className="flex items-center space-x-6 text-sm text-gray-500">
-              <Link to="/" className="hover:text-blue-600 transition-colors">
+            <div className="flex items-center gap-4">
+              <Link to="/" className="transition-colors hover:text-[#f2ede4]">
                 Home
               </Link>
-              <Link to="/register" className="hover:text-blue-600 transition-colors">
-                Sign Up
-              </Link>
-              <Link to="/login" className="hover:text-blue-600 transition-colors">
+              <Link to="/login" className="transition-colors hover:text-[#f2ede4]">
                 Login
+              </Link>
+              <Link to="/register" className="transition-colors hover:text-[#f2ede4]">
+                Sign up
               </Link>
             </div>
           </div>
