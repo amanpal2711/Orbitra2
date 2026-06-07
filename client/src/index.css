@@ -81,12 +81,6 @@
       cursor: auto !important;
     }
   }
-
-  @media (pointer: fine) {
-    * {
-      cursor: none;
-    }
-  }
 }
 
 @layer components {
@@ -245,17 +239,6 @@
     background: linear-gradient(90deg, #1c1f1b 25%, #252822 50%, #1c1f1b 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
-  }
-
-  .cursor-ring {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 70;
-    pointer-events: none;
-    border-radius: 9999px;
-    will-change: transform, width, height, opacity;
-    mix-blend-mode: difference;
   }
 
   .noise-overlay {

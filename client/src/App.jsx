@@ -2,7 +2,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import useAuthStore from './stores/authStore'
 import useLenis from './hooks/useLenis'
-import CustomCursor from './components/cursor/CustomCursor'
 import PageTransition from './components/layout/PageTransition'
 import ProtectedRoute from './components/ProtectedRoute'
 import LandingPage from './pages/LandingPage'
@@ -20,7 +19,6 @@ function AppContent() {
 
   return (
     <PageTransition>
-      <CustomCursor />
       <Toaster
         position="top-right"
         toastOptions={{
